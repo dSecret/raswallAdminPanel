@@ -4,7 +4,7 @@ import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.css'
 import VueRouter from 'vue-router'
 import Routes from './routes'
-
+ 
 Vue.use(Vuetify)
 Vue.use(VueRouter)
 

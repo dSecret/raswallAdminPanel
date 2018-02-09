@@ -1,22 +1,32 @@
 <template>
-  <div id="app">
+  <div id="appentrance">
       <router-view></router-view>
   </div>
 </template>
 
 <script>
+import axios from 'axios'
   export default {
-
+    data(){
+      return{
+        post:[]
+      }
+    },
+    methods:{
+      login:function(){
+          axios.get('https://jsonplaceholder.typicode.com/posts/').then(res=>{
+              console.log(res.data)
+              this.post=res.data
+          })
+      }
+    }
   }
 </script>
 <style scoped>
-#app{
+#appentrance{
   height:100vh;
   width:100vw;
-  display:flex;
-  justify-content:center;
-  align-items:center;
   overflow:hidden;
-  // background-color:red;
+  /*background-color:red;*/
 }
 </style>

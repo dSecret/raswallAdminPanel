@@ -1,5 +1,8 @@
-import login from './pages/home/home.vue'
+import login from './pages/login/login.vue'
+import home from './pages/home/home.vue'
+
 
 export default [
-	{path:"/",component:login}
+	{path:"/",component:home},
+	{path:"/login",component:login}
   ]
