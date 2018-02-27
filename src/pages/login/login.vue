@@ -13,7 +13,7 @@
                 v-model="user.psw"
                 required
               ></v-text-field>
-               <v-btn color="primary "  v-on:click="login">Primary</v-btn>
+               <v-btn color="primary " >Primary</v-btn>
               <!-- {{post}} -->
             </v-form>
             {{status}}
@@ -22,7 +22,6 @@
   </v-app>
 </template>
 <script>
-import axios from 'axios'
 
 export default {
     data () {
@@ -35,17 +34,7 @@ export default {
       }
     },
     methods:{
-      login:function(){
-          axios({ url:'http://localhost:8000/login',
-                  method:'post',
-                  data:this.user,
-                  withCredentials:false
 
-          }).then((response)=>{
-              console.log(response.data,"working")
-              this.status=response.data
-          })
-      }
     },
     created(){
       // console.log("enter")
