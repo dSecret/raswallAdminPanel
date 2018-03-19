@@ -7,12 +7,18 @@
     class="elevation-1 mr-2"
   >
     <template slot="items" slot-scope="props">
-      <td>{{ props.item.name }}</td>
-      <td class="text-xs-right">{{ props.item.calories }}</td>
-      <td class="text-xs-right">{{ props.item.fat }}</td>
-      <td class="text-xs-right">{{ props.item.carbs }}</td>
-      <td class="text-xs-right">{{ props.item.protein }}</td>
-      <td class="text-xs-right">{{ props.item.iron }}</td>
+      <td>{{ props.item._id }}</td>
+      <td class="text-xs-right">{{ props.item.catgName }}</td>
+      <td class="text-xs-right">{{ props.item.maxTime }}</td>
+      <td class="text-xs-right">{{ props.item.enrolledLists }}</td>
+      <td class="justify-center layout px-0">
+          <v-btn icon class="mx-0" @click="editItem(props.item)">
+            <v-icon color="teal">edit</v-icon>
+          </v-btn>
+          <v-btn icon class="mx-0" @click="deleteItem(props.item)">
+            <v-icon color="pink">delete</v-icon>
+          </v-btn>
+      </td>
     </template>
   </v-data-table>
  <v-btn
@@ -22,7 +28,7 @@
       color="pink"
       dark
       fixed
-      @click.stop="dialog = !dialog"
+      @click.native="editItem(defaultItem)"
     >
       <v-icon>add</v-icon>
     </v-btn>
@@ -31,152 +37,143 @@
         <v-card-title
           class="grey lighten-4 py-4 title"
         >
-          Add new category
+          {{formTitle}}
         </v-card-title>
         <v-container grid-list-sm class="pa-4">
           <v-layout row wrap>
-            <v-flex xs12 align-center justify-space-between>
-              <v-layout align-center>
-                
+            <v-flex xs6>
                 <v-text-field
-                  prepend-icon="category"
                   placeholder="CategoryName"
+                  v-model="editedItem.catgName"
                 ></v-text-field>
-              </v-layout>
             </v-flex>
             <v-flex xs6>
               <v-text-field
-                prepend-icon="business"
-                placeholder="MaxTimeLimit"
-              ></v-text-field>
-            </v-flex>
-            <v-flex xs6>
-              <v-text-field
-                placeholder="EnrolledList"
+                placeholder="MaxTime"
+                v-model="editedItem.maxTime"
               ></v-text-field>
             </v-flex>
           </v-layout>
         </v-container>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn flat color="primary" @click="dialog = false">Cancel</v-btn>
-          <v-btn flat @click="dialog = false">Save</v-btn>
+          <v-btn flat color="primary" @click.native="close">Cancel</v-btn>
+          <v-btn flat @click.native="save">Save</v-btn>
         </v-card-actions>
       </v-card>
 </v-dialog>
 </div>
 </template>
 <script>
-  export default {
+import {getCategories,deleteCategory,saveCategory,addCategory} from '../../../helpers/userManagement.js'
+export default {
     data () {
       return {
         dialog:false,
         headers: [
-          {
-            text: 'Users',
-            align: 'left',
-            sortable: false,
-            value: 'name'
+          { 
+            text: 'id', 
+            value: '_id',
+            align: 'center',
+            sortable: false 
           },
-          { text: 'Calories', value: 'calories' },
-          { text: 'Fat (g)', value: 'fat' },
-          { text: 'Carbs (g)', value: 'carbs' },
-          { text: 'Protein (g)', value: 'protein' },
-          { text: 'Iron (%)', value: 'iron' }
-        ],
-        items: [
-          {
-            value: false,
-            name: 'Frozen Yogurt',
-            calories: 159,
-            fat: 6.0,
-            carbs: 24,
-            protein: 4.0,
-            iron: '1%'
+          { text: 'Category', 
+            value: 'catgName', 
+            align:'right'
           },
-          {
-            value: false,
-            name: 'Ice cream sandwich',
-            calories: 237,
-            fat: 9.0,
-            carbs: 37,
-            protein: 4.3,
-            iron: '1%'
+          { text: 'MaxTime', 
+            value: 'maxTime',
+            align:'right'
           },
-          {
-            value: false,
-            name: 'Eclair',
-            calories: 262,
-            fat: 16.0,
-            carbs: 23,
-            protein: 6.0,
-            iron: '7%'
+          { text: 'EnrolledLists', 
+            value: 'enrolledLists',
+            align:'center'
           },
-          {
-            value: false,
-            name: 'Cupcake',
-            calories: 305,
-            fat: 3.7,
-            carbs: 67,
-            protein: 4.3,
-            iron: '8%'
-          },
-          {
-            value: false,
-            name: 'Gingerbread',
-            calories: 356,
-            fat: 16.0,
-            carbs: 49,
-            protein: 3.9,
-            iron: '16%'
-          },
-          {
-            value: false,
-            name: 'Jelly bean',
-            calories: 375,
-            fat: 0.0,
-            carbs: 94,
-            protein: 0.0,
-            iron: '0%'
-          },
-          {
-            value: false,
-            name: 'Lollipop',
-            calories: 392,
-            fat: 0.2,
-            carbs: 98,
-            protein: 0,
-            iron: '2%'
-          },
-          {
-            value: false,
-            name: 'Honeycomb',
-            calories: 408,
-            fat: 3.2,
-            carbs: 87,
-            protein: 6.5,
-            iron: '45%'
-          },
-          {
-            value: false,
-            name: 'Donut',
-            calories: 452,
-            fat: 25.0,
-            carbs: 51,
-            protein: 4.9,
-            iron: '22%'
-          },
-          {
-            value: false,
-            name: 'KitKat',
-            calories: 518,
-            fat: 26.0,
-            carbs: 65,
-            protein: 7,
-            iron: '6%'
+          { 
+            text: 'Actions', 
+            value: '_id', 
+            sortable: false 
           }
-        ]
+        ],
+        items: [],
+        editedIndex: -1,
+        editedItem: {
+          __v:'',
+          _id:'',
+          catgName:'',
+          maxTime:'',
+          enrolledLists:[]
+        },
+        defaultItem: {
+          __v:'',
+          _id:'',
+          catgName:'',
+          maxTime:'',
+          enrolledLists:[]
+        }
+      }
+    },
+    computed: {
+      formTitle () {
+        return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
+      }
+    },
+    watch: {
+      dialog (val) {
+        val || this.close()
+      }
+    },    
+    created(){
+        this.getCategories()
+    },
+    methods:{
+      editItem (item) {
+        // this.editedIndex = this.items.indexOf(item)
+        if(item._id==='')
+          this.editedIndex=1
+        else
+          this.editedIndex=0
+        this.editedItem = Object.assign({}, item)
+        this.dialog = true
+      },
+      deleteItem (item) {
+        confirm('Are you sure you want to delete this Category?') && 
+        deleteCategory(item).then(res=>{
+            console.log(res)
+            if(res.status==200){
+                this.getCategories()
+            }
+        })
+      },
+      getCategories(){
+        getCategories()
+            .then(res=>{
+                  this.items=res.data
+            })        
+      },
+
+      close () {
+        this.dialog = false
+        setTimeout(() => {
+          this.editedItem = Object.assign({}, this.defaultItem)
+          this.editedIndex = -1
+        }, 300)
+      },
+
+      save () {
+        if (this.editedIndex) {
+          addCategory(this.editedItem)
+                .then(res=>{
+                    console.log(res)
+                })
+        } else {
+          saveCategory(this.editedItem)
+                      .then(res=>{
+                        console.log(res)
+                      })
+        }
+        this.close()
       }
     }
-  }
+}
 </script>

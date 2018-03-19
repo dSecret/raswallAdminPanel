@@ -10,7 +10,7 @@ export default [
 	 	children:[
 	 		{path:'',component:inhome},
 	 		{path:'users',component:users},
-	 		{path:'category',component:category}
+	 		{path:'user-type',component:category}
 		]
 	},
 	{

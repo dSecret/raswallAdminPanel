@@ -29,7 +29,7 @@
       color="pink"
       dark
       fixed
-      @click.stop="dialog = !dialog"
+      @click.native="editItem(defaultItem)"
     >
       <v-icon>add</v-icon>
     </v-btn>
@@ -73,7 +73,7 @@
 </div>
 </template>
 <script>
-import {getUserList} from '../../../helpers/userManagement.js'
+import {getUserList,deleteUser,saveUser,addUser} from '../../../helpers/userManagement.js'
 export default {
     data () {
       return {
@@ -138,21 +138,32 @@ export default {
       }
     },    
     created(){
-        getUserList()
-            .then(res=>{
-                  this.items=res.data
-            })
+        this.getUserList()
     },
     methods:{
       editItem (item) {
-        this.editedIndex = this.items.indexOf(item)
+        // this.editedIndex = this.items.indexOf(item)
+        if(item._id==='')
+          this.editedIndex=1
+        else
+          this.editedIndex=0
         this.editedItem = Object.assign({}, item)
         this.dialog = true
       },
-
       deleteItem (item) {
-        const index = this.items.indexOf(item)
-        confirm('Are you sure you want to delete this item?') && this.items.splice(index, 1)
+        confirm('Are you sure you want to delete this user?') && 
+        deleteUser(item).then(res=>{
+            console.log(res)
+            if(res.status==200){
+                this.getUserList()
+            }
+        })
+      },
+      getUserList(){
+        getUserList()
+            .then(res=>{
+                  this.items=res.data
+            })        
       },
 
       close () {
@@ -164,10 +175,16 @@ export default {
       },
 
       save () {
-        if (this.editedIndex > -1) {
-          Object.assign(this.items[this.editedIndex], this.editedItem)
+        if (this.editedIndex) {
+          addUser(this.editedItem)
+                .then(res=>{
+                    console.log(res)
+                })
         } else {
-          this.items.push(this.editedItem)
+          saveUser(this.editedItem)
+                      .then(res=>{
+                        console.log(res)
+                      })
         }
         this.close()
       }
